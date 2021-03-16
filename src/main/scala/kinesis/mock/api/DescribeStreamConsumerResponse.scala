@@ -2,9 +2,7 @@ package kinesis.mock.api
 
 import io.circe._
 
-import kinesis.mock.models.Consumer
-
-final case class DescribeStreamConsumerResponse(consumerDescription: Consumer)
+final case class DescribeStreamConsumerResponse(consumerDescription: ConsumerSummary)
 
 object DescribeStreamConsumerResponse {
   implicit val describeStreamConsumerResponseCirceEncoder
@@ -14,7 +12,7 @@ object DescribeStreamConsumerResponse {
   implicit val describeStreamConsumerResponseCirceDecoder
       : Decoder[DescribeStreamConsumerResponse] = {
     _.downField("ConsumerDescription")
-      .as[Consumer]
+      .as[ConsumerSummary]
       .map(DescribeStreamConsumerResponse.apply)
   }
 }

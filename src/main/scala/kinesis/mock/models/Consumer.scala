@@ -8,7 +8,8 @@ final case class Consumer(
     consumerArn: String,
     consumerCreationTimestamp: Instant,
     consumerName: String,
-    consumerStatus: ConsumerStatus
+    consumerStatus: ConsumerStatus,
+    isProcessing: Boolean
 )
 
 object Consumer {
@@ -18,20 +19,23 @@ object Consumer {
       s"$streamArn/consumer/$consumerName:${consumerCreationTimestamp.getEpochSecond()}",
       consumerCreationTimestamp,
       consumerName,
-      ConsumerStatus.CREATING
+      ConsumerStatus.CREATING,
+      false
     )
   }
-  implicit val consumerCirceEncoder: Encoder[Consumer] = Encoder.forProduct4(
+  implicit val consumerCirceEncoder: Encoder[Consumer] = Encoder.forProduct5(
     "ConsumerARN",
     "ConsumerCreationTimestamp",
     "ConsumerName",
-    "ConsumerStatus"
+    "ConsumerStatus",
+    "IsProcessing"
   )(x =>
     (
       x.consumerArn,
       x.consumerCreationTimestamp,
       x.consumerName,
-      x.consumerStatus
+      x.consumerStatus,
+      x.isProcessing
     )
   )
 
@@ -43,11 +47,13 @@ object Consumer {
         .as[Instant]
       consumerName <- x.downField("ConsumerName").as[String]
       consumerStatus <- x.downField("ConsumerStatus").as[ConsumerStatus]
+      isProcessing <- x.downField("IsProcessing").as[Boolean]
     } yield Consumer(
       consumerArn,
       consumerCreationTimestamp,
       consumerName,
-      consumerStatus
+      consumerStatus,
+      isProcessing
     )
   }
 }

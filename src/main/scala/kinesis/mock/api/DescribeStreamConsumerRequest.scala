@@ -22,13 +22,20 @@ final case class DescribeStreamConsumerRequest(
     (consumerArn, consumerName, streamArn) match {
       case (Some(cArn), _, _) =>
         CommonValidations.findStreamByConsumerArn(cArn, streams).map {
-          case (consumer, _) => DescribeStreamConsumerResponse(consumer)
+          case (consumer, _) =>
+            DescribeStreamConsumerResponse(
+              ConsumerSummary.fromConsumer(consumer)
+            )
         }
       case (None, Some(cName), Some(sArn)) =>
         CommonValidations.findStreamByArn(sArn, streams).andThen { stream =>
           CommonValidations
             .findConsumer(cName, stream)
-            .map(DescribeStreamConsumerResponse.apply)
+            .map(consumer =>
+              DescribeStreamConsumerResponse(
+                ConsumerSummary.fromConsumer(consumer)
+              )
+            )
         }
       case _ =>
         InvalidArgumentException(
